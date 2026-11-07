@@ -1,0 +1,12 @@
+ShadowCrypt demo payload
+
+This message was encrypted with AES-256-GCM, its one-time session key was
+wrapped with RSA-3072-OAEP, and the complete package was embedded in the
+least significant bits of the carrier PNG.
+
+Nobody looking at the image file can read this text, and the image itself
+still looks like an ordinary photograph.
+
+Try it yourself: run the encryption, then open the Decryption section,
+select the produced PNG, load the matching private key, and enter its
+passphrase. The recovered SHA-256 should match the original payload.

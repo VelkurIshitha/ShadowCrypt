@@ -1,0 +1,778 @@
+/plan
+
+You do not need to access or read any PDF. All project requirements, architecture decisions, technical specifications, and implementation instructions are provided directly in this prompt.
+
+Treat this prompt as the single source of truth for ShadowCrypt.
+
+Before implementation:
+
+Inspect the current project directory.
+
+Check the installed Java and Maven versions.
+
+Identify existing files and configurations.
+
+Follow the complete ShadowCrypt specification included below.
+
+Produce a detailed implementation plan before writing code.
+
+Do not assume that an inaccessible PDF or external document contains additional requirements. If something essential is genuinely unspecified, identify it and ask me rather than inventing a design decision.
+
+/plan
+
+# PROJECT: SHADOWCRYPT
+## Complete Java Desktop Application Development
+
+I want you to develop a complete Java-based desktop application named **ShadowCrypt**. Before doing anything, thoroughly inspect the PDF present in the current project directory. It contains the project's technical specifications, architecture, cryptographic design, binary package format, features, limitations, and implementation roadmap.
+
+Treat that PDF and the requirements below as the project's source of truth. If you find a conflict, identify it and explain the issue before making a design decision.
+
+Do not immediately start generating code. First inspect the existing project directory, read the PDF, understand the requirements, and produce a detailed implementation plan.
+
+---
+
+# 1. PROJECT OVERVIEW
+
+ShadowCrypt is an offline-first Java desktop application that combines hybrid cryptography and image steganography.
+
+Its purpose is to allow users to encrypt text or arbitrary files, conceal the encrypted information inside an ordinary PNG image, and allow the intended recipient to extract and decrypt the information using their private key.
+
+The application combines two techniques:
+
+**Cryptography:** Protects the actual contents of the message or file.
+
+**Steganography:** Attempts to conceal the existence of the encrypted information inside an image.
+
+The application also provides an image-analysis section that compares the original carrier image with the resulting stego image using visual and numerical metrics.
+
+All operations must happen locally. There must be:
+- No backend.
+- No cloud processing.
+- No external API dependencies.
+- No online encryption services.
+- No network requirement for normal application functionality.
+
+This is a Java desktop project. Reliability, modularity, security, maintainability, and debuggability are more important than unnecessary features.
+
+# 2. STRICT TECHNOLOGY REQUIREMENTS
+
+The application must use:
+
+- Java as the primary and exclusive application programming language.
+- JavaFX for the desktop interface.
+- Java Cryptography Architecture (JCA) for cryptographic operations.
+- Java BufferedImage and ImageIO for image processing.
+- Java I/O and NIO for file handling.
+- Maven for dependency and build management.
+
+**Language restrictions:**
+
+All application logic, UI construction, image processing, cryptography, data structures, and utilities must be implemented in Java.
+
+Do not use:
+- Python.
+- JavaScript.
+- TypeScript.
+- HTML.
+- React.
+- Electron.
+- Node.js.
+- Kotlin.
+- C or C++.
+- External scripts to perform application operations.
+
+Build configuration files such as `pom.xml` are permitted. Construct the JavaFX interface programmatically in Java. Avoid FXML and external scripting so the application remains Java-only.
+
+Do not introduce unnecessary frameworks or dependencies.
+
+# 3. APPLICATION STRUCTURE
+
+The application must have four primary sections:
+
+1. Encryption
+2. Decryption
+3. Image Analysis
+4. Key Management
+
+Each section must have its own Java package, controller, service, models where needed, and supporting classes.
+
+Do not put the entire application into one Java file.
+
+Do not create excessively large classes containing unrelated functionality.
+
+Keep UI code separate from business logic, cryptographic operations, image processing, and file handling.
+
+Use clear class names and meaningful method names.
+
+## Proposed directory structure
+
+Use this as the starting architecture. You may improve it if you have a good technical reason, but maintain the same separation of responsibilities.
+
+shadowcrypt/
+│
+├── pom.xml
+├── README.md
+├── docs/
+│   └── project-specification.pdf
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── shadowcrypt/
+│   │   │           │
+│   │   │           ├── app/
+│   │   │           │   ├── ShadowCryptApplication.java
+│   │   │           │   └── AppLauncher.java
+│   │   │           │
+│   │   │           ├── ui/
+│   │   │           │   ├── main/
+│   │   │           │   ├── components/
+│   │   │           │   ├── navigation/
+│   │   │           │   │
+│   │   │           │   ├── encryption/
+│   │   │           │   ├── decryption/
+│   │   │           │   ├── analysis/
+│   │   │           │   └── keys/
+│   │   │           │
+│   │   │           ├── crypto/
+│   │   │           │   ├── aes/
+│   │   │           │   ├── rsa/
+│   │   │           │   ├── keyderivation/
+│   │   │           │   ├── hashing/
+│   │   │           │   └── keystorage/
+│   │   │           │
+│   │   │           ├── steganography/
+│   │   │           │   ├── lsb/
+│   │   │           │   ├── encoding/
+│   │   │           │   ├── extraction/
+│   │   │           │   └── capacity/
+│   │   │           │
+│   │   │           ├── image/
+│   │   │           │   ├── normalization/
+│   │   │           │   ├── processing/
+│   │   │           │   └── models/
+│   │   │           │
+│   │   │           ├── format/
+│   │   │           │   ├── envelope/
+│   │   │           │   ├── payload/
+│   │   │           │   └── serialization/
+│   │   │           │
+│   │   │           ├── analysis/
+│   │   │           │   ├── metrics/
+│   │   │           │   ├── heatmap/
+│   │   │           │   └── comparison/
+│   │   │           │
+│   │   │           ├── files/
+│   │   │           │   ├── import/
+│   │   │           │   ├── export/
+│   │   │           │   └── validation/
+│   │   │           │
+│   │   │           ├── model/
+│   │   │           ├── service/
+│   │   │           ├── exception/
+│   │   │           └── util/
+│   │   │
+│   │   └── resources/
+│   │       └── images/
+│   │           └── carriers/
+│   │
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── shadowcrypt/
+│
+└── target/
+
+Use appropriate Java packages and subpackages. Do not create empty packages just to fill the tree. Create classes when their responsibilities are clear.
+
+# 4. USER INTERFACE REQUIREMENTS
+
+Create a clean, modern, professional JavaFX desktop interface.
+
+The application should have:
+- A consistent navigation system.
+- Four clearly separated sections.
+- A professional dark or neutral visual theme.
+- Proper spacing and alignment.
+- Consistent buttons, cards, labels, and input fields.
+- Clear success, warning, and error states.
+- Progress indicators for lengthy operations.
+- Image previews where appropriate.
+- No unnecessary visual clutter.
+
+Do not prioritize visual effects over functionality.
+
+All UI components should be constructed using JavaFX.
+
+## Section A: Encryption
+
+The encryption screen must provide:
+
+1. A choice between text encryption and file encryption.
+2. A text input area.
+3. A file-selection button.
+4. A selected-file information display.
+5. A PNG carrier-image selector.
+6. A small bundled gallery of two or three PNG images.
+7. Recipient public-key import.
+8. Recipient fingerprint display.
+9. A capacity indicator.
+10. An Encrypt and Embed button.
+11. An output location selector.
+12. A progress indicator.
+13. A success message after successful export.
+
+The user must be able to encrypt text or virtually any file format.
+
+Treat files as raw binary data. Do not restrict file support to PDFs or documents.
+
+## Section B: Decryption
+
+The decryption screen must provide:
+
+1. Stego PNG import.
+2. Private-key selection.
+3. Private-key passphrase input.
+4. Extraction progress.
+5. Decryption progress.
+6. Recovered text display when the payload is text.
+7. Recovered-file information when the payload is a file.
+8. Output location selection.
+9. SHA-256 verification result.
+10. Clear error messages when extraction, key recovery, or authentication fails.
+
+## Section C: Image Analysis
+
+This section must show analysis results from an actual encryption operation.
+
+Include:
+
+- Original normalized carrier-image preview.
+- Generated stego-image preview.
+- Difference heatmap.
+- Original image dimensions.
+- Stego image dimensions.
+- Original PNG file size.
+- Stego PNG file size.
+- Absolute file-size difference.
+- Percentage file-size difference.
+- Original payload size.
+- Complete package size.
+- Theoretical carrier capacity.
+- Capacity utilization percentage.
+- MSE.
+- PSNR.
+- Embedding time.
+
+The heatmap must be generated by comparing the normalized original carrier image against the actual stego image.
+
+Do not use fabricated metrics, placeholder results, or hardcoded example values.
+
+The Analysis section is for image-impact analysis, not a separate tamper-analysis or robustness-testing module.
+
+## Section D: Key Management
+
+Include:
+
+- RSA key-pair generation.
+- RSA-3072 key size.
+- Public-key export.
+- Public-key import.
+- Local private-key storage.
+- Passphrase-protected private-key files.
+- Public-key SHA-256 fingerprint display.
+- Clear indication of public versus private key information.
+- Confirmation before overwriting existing key files.
+
+Private keys must never be transmitted.
+
+# 5. CRYPTOGRAPHIC IMPLEMENTATION
+
+This is a security-focused application. Use Java's established cryptographic providers through JCA. Never invent your own encryption algorithm or implement AES/RSA from scratch.
+
+## A. AES-256-GCM
+
+Use AES-256-GCM for encrypting the actual text or file contents.
+
+Requirements:
+
+- Generate a fresh random 256-bit AES key for every encrypted package.
+- Generate a fresh random 12-byte nonce.
+- Use a 128-bit authentication tag.
+- Use `SecureRandom` for cryptographic randomness.
+- Never reuse a nonce with the same AES key.
+- Use `Cipher` and `GCMParameterSpec`.
+- Support authenticated additional data through `Cipher.updateAAD()`.
+
+The GCM tag must be included in the stored ciphertext output.
+
+## B. RSA-OAEP
+
+Use RSA-3072 for key pairs.
+
+Use:
+- RSA-OAEP.
+- OAEP digest: SHA-256.
+- MGF1 digest: SHA-256.
+
+Explicitly configure OAEP using `OAEPParameterSpec` and the appropriate `MGF1ParameterSpec`.
+
+Do not rely on provider defaults.
+
+RSA is only used to wrap the AES session key. Never attempt to encrypt entire files using RSA.
+
+For RSA-3072, the wrapped AES key must be 384 bytes.
+
+## C. Private-key protection
+
+Protect private keys stored on disk using:
+
+- PBKDF2WithHmacSHA256.
+- Initial iteration count: 600,000.
+- Random salt.
+- AES-256-GCM.
+- Fresh nonce.
+
+Benchmark PBKDF2 performance on the target system and document the selected iteration count.
+
+Store the KDF parameters, salt, nonce, and encrypted private-key data in a well-defined versioned key-storage format.
+
+Never save the user's passphrase in plaintext.
+
+Never print passwords, AES keys, private-key bytes, or decrypted sensitive data in logs.
+
+## D. SHA-256
+
+Use SHA-256 for:
+
+- Original file hashing.
+- Recovered file hashing.
+- Public-key fingerprints.
+
+Compare the original and recovered file hashes to verify exact file recovery.
+
+# 6. STEGANOGRAPHY IMPLEMENTATION
+
+Implement only one steganography algorithm in the initial version:
+
+**Least Significant Bit (LSB) substitution.**
+
+Do not implement Adaptive LSB, DCT, or LSB Matching in the initial build.
+
+## Image requirements
+
+- Accept PNG carrier images only.
+- Load images using `ImageIO`.
+- Normalize every carrier image to a consistent RGB representation.
+- Define consistent alpha handling; embed only in RGB channels.
+- Preserve the normalized carrier image as the baseline for analysis.
+- Save the output as PNG.
+
+## Embedding order
+
+Use the following deterministic traversal:
+
+1. Row-major pixel order.
+2. Left to right.
+3. Top to bottom.
+4. Red channel.
+5. Green channel.
+6. Blue channel.
+7. Most-significant-bit-first within each payload byte.
+8. One payload bit per RGB channel LSB.
+
+The extractor must use exactly the same traversal.
+
+Use correct Java bitwise operations and handle signed Java bytes safely.
+
+The LSB implementation must be independent from the cryptographic implementation.
+
+## Capacity calculation
+
+Use:
+
+Capacity in bytes = floor((width × height × 3) / 8)
+
+This is the theoretical capacity before package overhead.
+
+Always calculate the complete encrypted package size before embedding.
+
+Reject the operation if the complete package exceeds the available capacity.
+
+Do not truncate payloads.
+
+# 7. BINARY PACKAGE FORMAT — SHADOWCRYPT V1
+
+Implement the following agreed versioned binary format.
+
+All integer fields must use big-endian byte order.
+
+There are two layers:
+
+1. Readable outer envelope.
+2. Encrypted inner payload.
+
+## A. Outer envelope
+
+| Field | Size |
+|---|---:|
+| Magic number: SHDW | 4 bytes |
+| Version | 1 byte |
+| Flags | 1 byte |
+| Total package length | 4 bytes |
+| Wrapped-key length | 2 bytes |
+| Nonce length | 1 byte |
+| Ciphertext length | 4 bytes |
+| Wrapped AES key | 384 bytes |
+| GCM nonce | 12 bytes |
+| Ciphertext + tag | Variable |
+
+The fixed bootstrap header is 17 bytes.
+
+The RSA-wrapped key is 384 bytes for RSA-3072.
+
+The nonce is 12 bytes.
+
+The GCM ciphertext length includes the 16-byte authentication tag.
+
+## B. Encrypted inner payload
+
+| Field | Size |
+|---|---:|
+| Inner magic: DATA | 4 bytes |
+| Inner version | 1 byte |
+| Payload type | 1 byte |
+| Filename length | 2 bytes |
+| Filename | Variable |
+| MIME length | 2 bytes |
+| MIME type | Variable |
+| Original data length | 8 bytes |
+| Original data | Variable |
+
+Payload types:
+- `0x01`: Text.
+- `0x02`: File.
+
+Filename and MIME metadata must be inside the encrypted inner payload, not exposed in the readable outer envelope.
+
+Use UTF-8 for strings. Length fields must count encoded bytes, not Java characters.
+
+## C. AES-GCM AAD
+
+Use the exact canonical serialized outer header as AAD.
+
+Include:
+- Magic number.
+- Version.
+- Flags.
+- Total package length.
+- Wrapped-key length.
+- Nonce length.
+- Ciphertext length.
+- Wrapped AES key.
+- Nonce.
+
+Do not include ciphertext in AAD. GCM authenticates ciphertext separately.
+
+The sender must construct the complete outer header before GCM encryption. Since the GCM tag is 16 bytes, ciphertext length is known as inner plaintext length + 16.
+
+The receiver must reconstruct the exact same AAD bytes.
+
+## D. Extraction safety
+
+The extractor must:
+
+1. Read only the fixed 17-byte bootstrap header first.
+2. Validate magic number and version.
+3. Validate all fixed field lengths.
+4. Validate total package length against carrier capacity.
+5. Validate internal length consistency.
+6. Reject negative, impossible, or oversized lengths.
+7. Only then allocate bounded buffers and extract the remaining package.
+
+Never trust lengths from an image before validating them.
+
+# 8. FILE SAFETY
+
+Files and filenames are untrusted input.
+
+Implement:
+
+- Safe file import.
+- Safe file export.
+- Filename sanitization.
+- Path traversal prevention.
+- Rejection of `/` and `\` in recovered filename metadata.
+- Protection against invalid filenames.
+- No silent overwriting of existing files.
+- Clear confirmation before replacing a file.
+- Safe handling of empty files and large files.
+
+Do not directly use an extracted filename as a filesystem path.
+
+Keep the output directory user-selected.
+
+# 9. IMAGE ANALYSIS IMPLEMENTATION
+
+Implement the following metrics.
+
+## MSE
+
+MSE = (1/N) × sum((original[i] - stego[i])²)
+
+Calculate it using corresponding RGB channel values from the normalized original image and stego image.
+
+## PSNR
+
+PSNR = 10 × log10(MAX² / MSE)
+
+For 8-bit channels, MAX = 255.
+
+If MSE is zero, display PSNR as infinity or an appropriate identical-image result.
+
+## Difference heatmap
+
+Calculate absolute RGB differences between the normalized original and stego image.
+
+Amplify the differences to make small pixel modifications visually observable.
+
+## Other metrics
+
+Calculate:
+- Original and stego PNG file sizes.
+- Absolute and percentage file-size difference.
+- Payload size.
+- Complete package size.
+- Theoretical capacity.
+- Capacity utilization percentage.
+- Embedding time.
+
+All results must come from actual operations.
+
+Do not add SSIM unless the core application is complete and stable.
+
+# 10. APPLICATION ARCHITECTURE AND CODE QUALITY
+
+Follow these rules strictly:
+
+1. UI classes must not contain cryptographic algorithms.
+2. Cryptographic classes must not depend on JavaFX.
+3. Steganography classes must not depend on the UI.
+4. Package serialization must be independent from image embedding.
+5. Analysis calculations must be separate from UI presentation.
+6. Use services to connect modules.
+7. Use models for structured results.
+8. Use custom exceptions where appropriate.
+9. Avoid duplicated logic.
+10. Avoid giant classes.
+11. Avoid unnecessary abstractions.
+12. Use meaningful names and comments where they explain non-obvious decisions.
+13. Keep configuration and constants centralized.
+14. Make each module independently testable.
+15. Do not hide errors with empty catch blocks.
+16. Never log secrets.
+
+Use JavaFX `Task` or `Service` for lengthy operations so the UI does not freeze.
+
+# 11. TESTING REQUIREMENTS
+
+Create unit tests for individual modules and integration tests for the full workflow.
+
+Required tests:
+
+- Text encryption and decryption.
+- PDF round trip.
+- Arbitrary file round trip.
+- Empty file.
+- One-byte file.
+- Unicode filenames.
+- Correct RSA key.
+- Incorrect RSA key.
+- Correct private-key passphrase.
+- Incorrect private-key passphrase.
+- AES-GCM ciphertext modification.
+- Invalid magic number.
+- Unsupported version.
+- Truncated header.
+- Truncated ciphertext.
+- Invalid length fields.
+- Payload exactly at capacity.
+- Payload one byte over capacity.
+- Insufficient carrier capacity.
+- PNG save and reload.
+- SHA-256 equality of original and recovered files.
+
+The most important integration test is:
+
+Original file
+→ AES encryption
+→ RSA key wrapping
+→ package serialization
+→ LSB embedding
+→ PNG export
+→ PNG reload
+→ LSB extraction
+→ package parsing
+→ RSA key unwrapping
+→ AES-GCM decryption
+→ recovered file
+→ SHA-256 verification.
+
+The recovered file must be byte-for-byte identical to the original.
+
+# 12. FEATURES EXPLICITLY OUT OF SCOPE
+
+Do not implement these in the initial version:
+
+- Dedicated tamper-analysis UI or tamper button.
+- Automated robustness-analysis dashboard.
+- Adaptive LSB.
+- DCT steganography.
+- LSB Matching.
+- JPEG carrier support.
+- Compression.
+- Error-correction coding.
+- Cloud or server integration.
+- Messaging/network functionality.
+- QR public-key exchange.
+- Digital signatures.
+- SSIM unless time permits.
+
+AES-GCM authentication, malformed-package validation, incorrect-key handling, and file-integrity verification are still required internally.
+
+Do not add features simply because they seem interesting. Follow the agreed scope.
+
+# 13. IMPLEMENTATION PLAN
+
+Work in the following order:
+
+**Phase 1 — Project inspection and architecture**
+- Inspect the existing directory.
+- Read the project PDF.
+- Confirm Java and Maven availability.
+- Design the package structure.
+- Identify dependencies.
+- Produce the implementation plan.
+- Identify unresolved design questions.
+
+**Phase 2 — Cryptography**
+- Implement RSA key generation.
+- Implement AES-GCM encryption/decryption.
+- Implement RSA-OAEP wrapping/unwrapping.
+- Implement PBKDF2 private-key protection.
+- Implement SHA-256 hashing and fingerprints.
+- Write and run unit tests.
+
+**Phase 3 — Binary package format**
+- Implement outer envelope serialization.
+- Implement inner payload serialization.
+- Implement strict parsing and validation.
+- Implement AAD generation and reconstruction.
+- Test package round trips independently.
+
+**Phase 4 — Image and steganography**
+- Implement RGB normalization.
+- Implement capacity calculation.
+- Implement LSB embedding.
+- Implement LSB extraction.
+- Test arbitrary binary data round trips.
+
+**Phase 5 — Full integration**
+- Connect cryptography and package modules.
+- Connect package and steganography modules.
+- Complete an end-to-end file round trip.
+- Verify SHA-256 equality.
+
+**Phase 6 — JavaFX interface**
+- Build the main application window.:wq
+- Implement navigation.
+- Build Encryption.
+- Build Decryption.
+- Build Image Analysis.
+- Build Key Management.
+- Connect UI to services.
+- Add background tasks and progress indicators.
+
+**Phase 7 — Analysis**
+- Implement MSE.
+- Implement PSNR.
+- Implement difference heatmap.
+- Implement size and capacity metrics.
+- Connect actual results to the Analysis screen.
+
+**Phase 8 — Final validation**
+- Run all tests.
+- Fix bugs.
+- Test boundary conditions.
+- Prepare bundled PNG carriers.
+- Add a Load Demo Preset option.
+- Prepare a small sample file.
+- Rehearse the five-minute demonstration.
+
+# 14. HOW I WANT YOU TO WORK
+
+This is extremely important.
+
+Do not attempt to create the entire application in one response or one uncontrolled code-generation operation.
+
+First produce a detailed implementation plan.
+
+The plan must contain:
+- Proposed directory tree.
+- Maven dependencies.
+- Class-by-class responsibilities.
+- Data flow between modules.
+- Binary package implementation plan.
+- Cryptographic implementation plan.
+- Image-processing implementation plan.
+- UI implementation plan.
+- Testing plan.
+- Implementation phases.
+- Dependencies between tasks.
+- Potential technical risks and how you will handle them.
+
+Identify any contradictions or missing details in the PDF and ask me only when a decision genuinely blocks implementation.
+
+Once the plan is approved, implement the application phase by phase.
+
+After completing each phase:
+
+1. List the files created or modified.
+2. Explain what each file does.
+3. Compile the project.
+4. Run relevant tests.
+5. Fix errors before proceeding.
+6. Update the project documentation.
+7. Confirm what is completed and what remains.
+
+Never claim a feature works unless you have actually compiled and tested it.
+
+Do not create fake implementations, placeholder encryption, hardcoded analysis results, mock decryption, or UI buttons that do nothing.
+
+If a feature is incomplete, clearly label it as incomplete.
+
+Keep the project buildable throughout development.
+
+Do not overwrite or delete existing project files without inspecting them first.
+
+# 15. FIRST TASK
+
+For now, do not begin implementing the application.
+
+Inspect the PDF in the current directory and the existing project structure.
+
+Then return:
+
+1. Your understanding of ShadowCrypt.
+2. The finalized feature list.
+3. The proposed directory tree.
+4. The class-by-class architecture.
+5. The Maven dependency list.
+6. The exact implementation sequence.
+7. Any technical risks or ambiguities.
+8. A list of decisions that require my approval.
+
+I want a professional, maintainable, secure Java application—not a rushed prototype.
+
+The priority is a fully working end-to-end system with clean architecture and reliable results.
