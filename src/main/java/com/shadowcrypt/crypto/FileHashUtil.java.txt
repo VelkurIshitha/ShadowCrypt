@@ -1,0 +1,40 @@
+package com.shadowcrypt.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.MessageDigest;
+
+/**
+ * Utility class for generating SHA-256 file checksums 
+ * to ensure cryptographic integrity in ShadowCrypt.
+ */
+public class FileHashUtil {
+
+    public static String calculateSHA256(File file) {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] byteBuffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = fis.read(byteBuffer)) != -1) {
+                digest.update(byteBuffer, 0, bytesRead);
+            }
+
+            byte[] hashBytes = digest.digest();
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        } catch (Exception e) {
+            System.err.println("Error calculating file hash: " + e.getMessage());
+            return null;
+        }
+    }
+}
