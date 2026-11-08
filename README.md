@@ -137,3 +137,4 @@ steganography packages import no JavaFX. See `docs/ARCHITECTURE.md` for details.
 
 All eight phases are complete. The application compiles, the complete test suite passes, and
 the JavaFX interface launches. See `docs/ARCHITECTURE.md` for module boundaries and formats.
+Contributor: Ishitha
